@@ -1,21 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:bloc/bloc.dart';
-import 'dart:math' as math show Random;
-
 import 'package:flutter_bloc_series/blocs/done/done_cubit.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -24,7 +11,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-  late final DoneCubit done;
+  late final NamesCubit done;
 
   void _incrementCounter() {
     setState(() {
@@ -35,7 +22,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     // TODO: implement initState
-    done = DoneCubit();
+    done = NamesCubit();
     super.initState();
   }
 
@@ -63,18 +50,24 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headline4,
             ),
-            StreamBuilder(
+            StreamBuilder<String?>(
               stream: done.stream,
               builder: (context, snapshot) {
-                final button =
-                    TextButton(onPressed: () {}, child: const Text('Press me'));
+                final button = TextButton(
+                    onPressed: () => done.pickRandomState(),
+                    child: const Text('Press me'));
                 switch (snapshot.connectionState) {
                   case ConnectionState.none:
                     return button;
                   case ConnectionState.waiting:
                     return button;
                   case ConnectionState.active:
-                    return const SizedBox();
+                    return Column(
+                      children: [
+                        Text(snapshot.data ?? ''),
+                        button,
+                      ],
+                    );
                   case ConnectionState.done:
                     return button;
                 }
