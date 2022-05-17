@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc_series/blocs/done/done_cubit.dart';
+import 'package:flutter_bloc_series/enums/person_url.dart';
+import 'package:flutter_bloc_series/models/person.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
@@ -19,6 +22,13 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Future getPersons(String url) async {
+    var response = await rootBundle.loadStructuredData(url, (jsonStr) async {
+      print(jsonStr);
+      // return jsonStr;
+    });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -35,6 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    getPersons(PersonUrl.persons1.urlString);
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -54,8 +65,9 @@ class _MyHomePageState extends State<MyHomePage> {
               stream: done.stream,
               builder: (context, snapshot) {
                 final button = TextButton(
-                    onPressed: () => done.pickRandomState(),
-                    child: const Text('Press me'));
+                  onPressed: () => done.pickRandomState(),
+                  child: const Text('Press me'),
+                );
                 switch (snapshot.connectionState) {
                   case ConnectionState.none:
                     return button;
