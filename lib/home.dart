@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_bloc_series/blocs/done/done_cubit.dart';
+import 'package:flutter_bloc_series/blocs/person_bloc.dart';
 import 'package:flutter_bloc_series/enums/person_url.dart';
 import 'package:flutter_bloc_series/models/person.dart';
+
+extension Subscript<T> on Iterable {
+  T? operator [](int index) => length > index ? elementAt(index) : null;
+}
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
@@ -22,13 +28,6 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  Future getPersons(String url) async {
-    var response = await rootBundle.loadStructuredData(url, (jsonStr) async {
-      print(jsonStr);
-      // return jsonStr;
-    });
-  }
-
   @override
   void initState() {
     // TODO: implement initState
@@ -45,7 +44,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    getPersons(PersonUrl.persons1.urlString);
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -84,7 +82,40 @@ class _MyHomePageState extends State<MyHomePage> {
                     return button;
                 }
               },
-            )
+            ),
+            const SizedBox(
+              height: 70,
+            ),
+            Center(
+              child: Row(
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      context.read<PersonBloc>().add(
+                            const LoadPersonsAction(url: PersonUrl.persons1),
+                          );
+                    },
+                    child: const Text(
+                      'Load Json 1',
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      context.read<PersonBloc>().add(
+                            const LoadPersonsAction(
+                              url: PersonUrl.persons2,
+                            ),
+                          );
+                    },
+                    child: const Text(
+                      'Load Json 2',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            BlocBuilder<PersonBloc, FetchResult?>(
+                builder: (context, state) => Container())
           ],
         ),
       ),
