@@ -5,9 +5,14 @@ import 'package:flutter_bloc_series/blocs/done/done_cubit.dart';
 import 'package:flutter_bloc_series/blocs/person_bloc.dart';
 import 'package:flutter_bloc_series/enums/person_url.dart';
 import 'package:flutter_bloc_series/models/person.dart';
+import 'dart:developer' as dev_tools show log;
 
 extension Subscript<T> on Iterable {
   T? operator [](int index) => length > index ? elementAt(index) : null;
+}
+
+extension Log on Object {
+  void log() => dev_tools.log(toString());
 }
 
 class MyHomePage extends StatefulWidget {
@@ -115,7 +120,25 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             BlocBuilder<PersonBloc, FetchResult?>(
-                builder: (context, state) => Container())
+                buildWhen: (previousResult, currentResult) {
+              return previousResult?.persons != currentResult?.persons;
+            }, builder: (context, fetchResult) {
+              fetchResult?.log();
+              final persons = fetchResult?.persons;
+              if (persons == null) {
+                return const SizedBox();
+              }
+              return Expanded(
+                child: ListView.builder(
+                    itemCount: persons.length,
+                    itemBuilder: (context, index) {
+                      final person = persons[index]!;
+                      return ListTile(
+                        title: Text(person.name),
+                      );
+                    }),
+              );
+            })
           ],
         ),
       ),
